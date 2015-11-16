@@ -10,6 +10,7 @@ return [
             'charset' => 'utf8',
         ],
         'cache' => [
+            
             'class' => 'yii\caching\FileCache',
         ],
     ],
