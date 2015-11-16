@@ -7,6 +7,21 @@ body {
     /*z-index: 100000 !important;*/
 /*}*/
 
+.body-home{
+    background: url("../images/fon.png");
+    background-size: 100% 100%;
+}
+
+.header-nat{
+    background: none;
+    border: none;
+}
+
+.navbar-header {
+    background: url("../images/opacity.png");
+    padding: 10px;
+}
+
 .wrap {
     min-height: 100%;
     height: auto;
@@ -19,9 +34,9 @@ body {
 }
 
 .footer {
+    background: url("../images/opacity.png");
     height: 60px;
-    background-color: #f5f5f5;
-    border-top: 1px solid #ddd;
+    color: #ccc;
     padding-top: 20px;
 }
 

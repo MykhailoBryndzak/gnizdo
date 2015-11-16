@@ -2,7 +2,9 @@
 
 namespace frontend\modules\costs\controllers;
 
+use frontend\assets\AppAsset;
 use Yii;
+use yii\bootstrap\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use frontend\modules\costs\models\CategoriesCosts;
@@ -13,6 +15,7 @@ use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\data\Pagination;
 use yii\data\ActiveDataProvider;
+use yii\web\Response;
 
 
 class DefaultController extends Controller
@@ -25,10 +28,26 @@ class DefaultController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['index', 'createCategory', 'createCost', 'updateCost', 'update'],
+                'only' => [
+                    'index',
+                    'createCategory',
+                    'createCost',
+                    'updateCost',
+                    'update',
+//                    'add-view',
+                    'add',
+                ],
                 'rules' => [
                     [
-                        'actions' => ['index', 'createCategory', 'createCost', 'updateCost', 'update'],
+                        'actions' => [
+                            'index',
+                            'createCategory',
+                            'createCost',
+                            'updateCost',
+                            'update',
+//                            'add-view',
+                            'add',
+                        ],
                         'allow' => true,
                         'roles' => ['@'],
                     ]
@@ -38,6 +57,7 @@ class DefaultController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'logout' => ['post'],
+                    'delete' => ['post'],
                 ],
             ],
         ];
@@ -60,54 +80,42 @@ class DefaultController extends Controller
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize=5;
 
+        $model = new CostsUsers();
+        $categoriesUser = CategoryCostsUsers::categoriesOfUser($userId);
+
+
 
         return $this->render('index', [
             'costsUser' => $models,
             'sumCosts' => $sumCosts,
             'pages' => $pages,
             'dataProvider' => $dataProvider,
-            'searchModel' => $searchModel
+            'searchModel' => $searchModel,
+            'model' => $model,
+            'categoriesUser' => $categoriesUser
         ]);
     }
 
     public function actionAdd()
     {
         $userId = Yii::$app->user->identity->getId();
-
         $request = Yii::$app->request;
-        if ($request->isAjax) {
 
-            $model = new CostsUsers();
-            $date = (new \DateTime())->format('Y-m-d');
-            $model->date = $date;
-            $model->user_id = $userId;
-
-            $categoriesUser = CategoryCostsUsers::categoriesOfUser($userId);
-
-            echo $this->renderAjax('ajaxAdd', [
-                'model' => $model,
-                'categoriesUser' => $categoriesUser
-            ]);
-        }
-
-        if ($request->isAjax && $post = $request->post('CostsUsers')) {
-
+        if ($request->post('CostsUsers')) {
             $model = new CostsUsers();
             $model->user_id = $userId;
-            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+
+            if ($model->load($request->post()) && $model->save()) {
                 \Yii::$app->getSession()->setFlash('success', 'Запис додано.');
                 return $this->redirect(['/costs']);
             } else {
+                \Yii::$app->getSession()->setFlash('error', 'Error');
                 return $this->redirect(['/costs']);
             }
         }
-    }
-
-
-    public function actionArchive()
-    {
 
     }
+
 
     public function actionCreateCategory()
     {
@@ -145,34 +153,10 @@ class DefaultController extends Controller
     }
 
 
-    public function actionUpdateCost($id)
+    public function actionUpdate($id)
     {
-        $userId = Yii::$app->user->identity->getId();
-
-        $model = CostsUsers::findOne($id);
-        $date = (new \DateTime($model->date))->format('Y-m-d');
-        $model->date = $date;
-        $model->user_id = $userId;
-        $model->cost = $model->cost / 100;
-
-        $categoriesUser = CategoryCostsUsers::categoriesOfUser($userId);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->refresh();
-        } else {
-            return $this->render('updateCost' , [
-                'model' => $model,
-                'categoriesUser' => $categoriesUser
-            ]);
-        }
-    }
-
-    public function actionUpdate()
-    {
-        $request = Yii::$app->request;
-        if ($request->isAjax && $id = $request->post('id')) {
-
             $userId = Yii::$app->user->identity->getId();
+
             $model = CostsUsers::findOne($id);
             $date = (new \DateTime($model->date))->format('Y-m-d');
             $model->date = $date;
@@ -181,33 +165,39 @@ class DefaultController extends Controller
 
             $categoriesUser = CategoryCostsUsers::categoriesOfUser($userId);
 
-            echo $this->renderPartial('ajaxUpdate', [
-                'model' => $model,
-                'categoriesUser' => $categoriesUser
-            ]);
-        }
-
-        if ($request->isPost && $post = $request->post('CostsUsers')) {
-//            echo '<pre>';
-//            var_dump($post);
-//            die;
-            $model = CostsUsers::findOne($post['id']);
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
-                \Yii::$app->getSession()->setFlash('error', 'Your Text Here..');
+                \Yii::$app->getSession()->setFlash('info', 'Запис оновлено.');
                 return $this->redirect(['/costs']);
             } else {
-                return $this->redirect(['/costs']);
+                return $this->renderAjax('ajaxUpdate', [
+                    'model' => $model,
+                    'categoriesUser' => $categoriesUser
+                ]);
             }
-        }
     }
 
-    public function actionDeleteCost($id)
+    public function actionDelete($id)
     {
-        $model = CostsUsers::findOne($id);
-        if ($model->delete()) {
-            return $this->redirect(['/costs']);
-        }
+        $this->findModel($id)->delete();
 
+        return $this->redirect(['/costs']);
+
+    }
+
+    /**
+     * Finds the CostsUsers model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return CostsUsers the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id)
+    {
+        if (($model = CostsUsers::findOne($id)) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
     }
 
 

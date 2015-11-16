@@ -21,25 +21,25 @@ AppAsset::register($this);
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
 </head>
-<body>
+<body class="body-home">
     <?php $this->beginBody() ?>
     <div class="wrap">
         <?php
             NavBar::begin([
-                'brandLabel' => 'Where My Money',
+                'brandLabel' => 'Gnizdo',
                 'brandUrl' => Yii::$app->homeUrl,
                 'options' => [
-                    'class' => 'navbar-inverse navbar-fixed-top',
+                    'class' => 'navbar-inverse navbar-fixed-top header-nat',
                 ],
             ]);
             $menuItems = [
-                ['label' => 'Home', 'url' => ['/site/index']],
+//                ['label' => 'Home', 'url' => ['/site/index']],
 //                ['label' => 'About', 'url' => ['/site/about']],
 //                ['label' => 'Contact', 'url' => ['/site/contact']],
             ];
             if (Yii::$app->user->isGuest) {
-                $menuItems[] = ['label' => 'Реєстрація', 'url' => ['/site/signup']];
-                $menuItems[] = ['label' => 'Вхід', 'url' => ['/site/login']];
+//                $menuItems[] = ['label' => 'Реєстрація', 'url' => ['/site/signup']];
+//                $menuItems[] = ['label' => 'Вхід', 'url' => ['/site/login']];
             } else {
                 $menuItems[] = [
                     'label' => 'Logout (' . Yii::$app->user->identity->username . ')',
@@ -55,17 +55,23 @@ AppAsset::register($this);
         ?>
 
         <div class="container">
-        <?= Breadcrumbs::widget([
-            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-        ]) ?>
+
         <?= Alert::widget() ?>
-        <?= $content ?>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="col-lg-8 col-sm-12"></div>
+                <div class="col-lg-4 col-sm-12">
+                    <?= $content ?>
+                </div>
+            </div>
+
+        </div>
         </div>
     </div>
 
     <footer class="footer">
         <div class="container">
-        <p class="pull-left">&copy; Where My Money <?= date('Y') ?></p>
+        <p class="pull-left">&copy; gnizdo <?= date('Y') ?></p>
         </div>
     </footer>
 

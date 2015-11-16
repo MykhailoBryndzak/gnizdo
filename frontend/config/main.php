@@ -43,8 +43,8 @@ return [
             'enablePrettyUrl' => true,
             'rules' => array(
 
-                '<module:costs>/<action:(update-cost|delete-cost)>/<id:\d+>' => '<module>/default/<action>',
-                '<module:costs>/<action:(archive|create-category|update|add)>' => '<module>/default/<action>',
+                '<module:costs>/<action:(update|delete)>/<id:\d+>' => '<module>/default/<action>',
+                '<module:costs>/<action:(archive|create-category|update|add|add-view)>' => '<module>/default/<action>',
 
                 '<module:income>/<action:(update-income|delete-income)>/<id:\d+>' => '<module>/default/<action>',
                 '<module:income>/<action:(archive|create-income|create-category)>' => '<module>/default/<action>',

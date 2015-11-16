@@ -17,7 +17,6 @@ use Yii;
  */
 class CostsUsers extends \yii\db\ActiveRecord
 {
-    public $createCategory;
     /**
      * @inheritdoc
      */
@@ -32,11 +31,11 @@ class CostsUsers extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['category_id' , 'user_id', 'cost'], 'required'],
+            [['user_id', 'cost', 'category_id'], 'required'],
             [['user_id'], 'integer'],
             [['cost'], 'validateCurrency'],
             [['description'], 'string'],
-            [['date' , 'description', 'createCategory'], 'safe']
+            [['date' , 'description'], 'safe']
         ];
     }
 
@@ -55,39 +54,47 @@ class CostsUsers extends \yii\db\ActiveRecord
         ];
     }
 
-    public function beforeValidate()
-    {
-        if (is_numeric($this->createCategory)) {
-            $this->addError('category_id' , 'Категорія не може містити тільки цифри!');
-        } else if (!empty($this->createCategory)) {
-            $this->category_id = $this->createCategory;
-            return true;
-        } else {
-            return true;
-        }
 
-        parent::beforeValidate();
-    }
+
+
+//    public function beforeValidate()
+//    {
+//        if (empty($this->category_id) || empty($this->createCategory)) {
+//            $this->addError('category_id' , 'Категорія не може пустою!');
+//        }
+//
+//        if (is_numeric($this->createCategory)) {
+//            $this->addError('category_id' , 'Категорія не може містити тільки цифри!');
+//        } else if (!empty($this->createCategory)) {
+//            $this->category_id = $this->createCategory;
+//            return true;
+//        } else {
+//            $this->category_id = $this->createCategory;
+//            return true;
+//        }
+//
+//        parent::beforeValidate();
+//    }
 
 
     public function beforeSave($insert)
     {
 
         if (parent::beforeSave($insert)) {
-            if (!is_numeric($this->category_id)) {
-                $id = Yii::$app->user->identity->id;
-                $model = new CategoriesCosts();
-                $model->name = $this->category_id;
-                $model->user_id = $id;
-                $model->static = 0;
-                if ($model->save(false)) {
-                    $categoryId = $model->id;
-                }
-            } else {
-                $categoryId = $this->category_id;
-            }
-
-            $this->category_id = $categoryId;
+//            if (!is_numeric($this->category_id)) {
+//                $id = Yii::$app->user->identity->id;
+//                $model = new CategoriesCosts();
+//                $model->name = $this->category_id;
+//                $model->user_id = $id;
+//                $model->static = 0;
+//                if ($model->save(false)) {
+//                    $categoryId = $model->id;
+//                }
+//            } else {
+//                $categoryId = $this->category_id;
+//            }
+//
+//            $this->category_id = $categoryId;
             $this->cost = (int) self::multiplyOn100($this->cost);
 
             return true;

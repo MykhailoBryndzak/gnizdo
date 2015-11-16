@@ -13,6 +13,7 @@ use frontend\modules\costs\models\CostsUsers;
  */
 class CostsUsersSearch extends CostsUsers
 {
+    public static $sum = 0;
     /**
      * @inheritdoc
      */
@@ -44,7 +45,8 @@ class CostsUsersSearch extends CostsUsers
     {
         $id = Yii::$app->user->identity->getId();
         $query = CostsUsers::find()
-                ->where(['user_id' => $id]);
+                ->where(['user_id' => $id])
+                ->orderBy('date desc');
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -67,6 +69,8 @@ class CostsUsersSearch extends CostsUsers
         ]);
 
         $query->andFilterWhere(['like', 'description', $this->description]);
+
+        self::$sum = ($query->sum('cost') / 100);
 
         return $dataProvider;
     }

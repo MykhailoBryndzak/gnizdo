@@ -1,5 +1,6 @@
 <?php
 
+
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 
@@ -9,6 +10,9 @@ use yii\jui\DatePicker ;
 use yii\web\JsExpression;
 use frontend\helpers\DateHelper;
 //use frontend\models\CategoriesCosts;
+
+
+
 
 
 /* @var $this yii\web\View */
@@ -138,3 +142,7 @@ $this->title = Yii::t('app', 'savings');
         </div>
     </div>
 </div>
+<?php
+
+
+?>

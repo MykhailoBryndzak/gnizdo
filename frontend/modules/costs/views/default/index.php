@@ -7,19 +7,38 @@ use frontend\modules\costs\models\CategoriesCosts;
 use frontend\modules\costs\models\CategoryCostsUsers;
 use frontend\modules\costs\models\search\CostsUsersSearch;
 
+use yii\bootstrap\Modal;
+
+use kartik\popover\PopoverX;
+use kartik\helpers\Html;
+use kartik\form\ActiveForm;
+
+$this->registerJs("
+    $(function() {
+       $('.popupModal').click(function(e) {
+         e.preventDefault();
+         $('#costModal').modal('show').find('.modal-body')
+         .load($(this).attr('href'));
+       });
+    });
+");
+
+?>
+
+<?php
+foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
+    echo '<div class="alert alert-' . $key . '">' . $message . '</div>';
+}
 ?>
 
 <div class="row">
     <div class="panel panel-info">
         <div class="panel-heading">
-            Всього: <?= $sumCosts; ?> грн.
+            Всього: <?= CostsUsersSearch::$sum; ?> грн.
         </div>
     </div>
-    <button class="btn btn-info" id="addCost">
-        Добавити
-    </button>
 
-    <?php \yii\widgets\Pjax::begin(); ?>
+    <?php //\yii\widgets\Pjax::begin(); ?>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
@@ -66,38 +85,66 @@ use frontend\modules\costs\models\search\CostsUsersSearch;
                 'class' => 'yii\grid\ActionColumn',
                 'header' => 'Дії',
                 'buttons' => [
-                    'update' => function($url, $model) {
-//                        $url = Url::toRoute(['/costs/update-cost/' . $model->id]);
-                        return \yii\helpers\Html::a('<i style="color: #5bc0de; font-size: 18px;" class="fa fa-retweet"></i>', '#', [
-//                            'style' => 'float: left;'
-                            'id' => 'update_' . $model->id
+                    'update' => function($url, $data)
+                    {
+                        return  Html::a(Yii::t('app', ' {modelClass}', [
+                            'modelClass' => '<i style="color: #5bc0de; font-size: 18px;" class="fa fa-retweet"></i>',
+                        ]), ['/costs/update/' . $data->id], [
+                            'class' => 'popupModal',
                         ]);
                     },
                     'delete' => function($url, $model) {
-                        $url = Url::toRoute(['/costs/delete-cost/' . $model->id]);
+                        $url = Url::toRoute(['/costs/delete/' . $model->id]);
                         $content = '<i style="color: #d9534f; font-size: 18px;" class="fa fa-times"></i>';
-                        return \yii\helpers\Html::a($content, $url);
+                        return \yii\helpers\Html::a($content, $url, [
+                            'data-confirm' => 'Видалити цей запис?',
+                            'data-method' =>'POST'
+                        ]);
                     },
                 ],
                 'template' => '{update} {delete}',
                 'contentOptions'=>['style'=>'width: 60px;']
             ],
         ],
+
     ]);
 
     ?>
-    <?php \yii\widgets\Pjax::end(); ?>
+    <?php //\yii\widgets\Pjax::end(); ?>
 </div>
+<!--<div id="osx-modal-content" tabindex="-1" role="dialog">-->
+<!--    <div id="osx-modal-title"> Modal Dialog</div>-->
+<!--    <div class="close"><a href="#" class="simplemodal-close">x</a></div>-->
+<!--    <div id="osx-modal-data">-->
+<!--    </div>-->
+<!--</div>-->
 
-<div id="osx-modal-content" tabindex="-1" role="dialog">
-    <div id="osx-modal-title"> Modal Dialog</div>
-    <div class="close"><a href="#" class="simplemodal-close">x</a></div>
-    <div id="osx-modal-data">
-    </div>
+<div class="col-lg-3">
+    <?php
+
+    Modal::begin([
+        'header' => '<h3>Добавити витрату</h3>',
+        'toggleButton' => [
+            'tag' => 'button',
+            'class' => 'btn btn-sm btn-block btn-info',
+            'label' => 'Добавити',
+        ],
+    ]);
+
+    echo $this->render('ajaxAdd', [
+        'model' => $model,
+        'categoriesUser' => $categoriesUser
+    ]);
+
+    Modal::end();
+
+    ?>
+
+    <?php
+     Modal::begin([
+         'header' => '<h3>Обновити витрату</h3>',
+         'id' =>'costModal',
+     ]);
+     Modal::end();
+    ?>
 </div>
-
-
-
-<script type="text/javascript">
-
-</script>

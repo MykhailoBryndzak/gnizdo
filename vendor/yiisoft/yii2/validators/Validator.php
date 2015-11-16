@@ -227,11 +227,14 @@ class Validator extends Component
      */
     public function validateAttributes($model, $attributes = null)
     {
+
         if (is_array($attributes)) {
             $attributes = array_intersect($this->attributes, $attributes);
         } else {
             $attributes = $this->attributes;
         }
+
+
         foreach ($attributes as $attribute) {
             $skip = $this->skipOnError && $model->hasErrors($attribute)
                 || $this->skipOnEmpty && $this->isEmpty($model->$attribute);

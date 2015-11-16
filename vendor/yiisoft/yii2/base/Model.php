@@ -330,6 +330,7 @@ class Model extends Component implements IteratorAggregate, ArrayAccess, Arrayab
      */
     public function validate($attributeNames = null, $clearErrors = true)
     {
+
         if ($clearErrors) {
             $this->clearErrors();
         }
@@ -347,6 +348,7 @@ class Model extends Component implements IteratorAggregate, ArrayAccess, Arrayab
         if ($attributeNames === null) {
             $attributeNames = $this->activeAttributes();
         }
+
 
         foreach ($this->getActiveValidators() as $validator) {
             $validator->validateAttributes($this, $attributeNames);
@@ -795,6 +797,7 @@ class Model extends Component implements IteratorAggregate, ArrayAccess, Arrayab
     public function load($data, $formName = null)
     {
         $scope = $formName === null ? $this->formName() : $formName;
+
         if ($scope === '' && !empty($data)) {
             $this->setAttributes($data);
 

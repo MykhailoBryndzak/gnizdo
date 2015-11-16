@@ -71,7 +71,14 @@ class SiteController extends Controller
             return $this->redirect('/user/profile');
         }
 
-        return $this->render('index');
+        $model = new LoginForm();
+        if ($model->load(Yii::$app->request->post()) && $model->login()) {
+            return $this->goBack();
+        } else {
+            return $this->render('index', [
+                'model' => $model,
+            ]);
+        }
     }
 
     public function actionLogin()
